@@ -1,0 +1,40 @@
+# Opcode contract
+# status: confirmed | guessed | ignore
+# seen_in: emulator | saga | both
+
+version: 1
+client_target: "jp-2017-08-31"
+notes: "IDs taken from EcoServerEmulator *Interface.json files."
+
+processes:
+  world:
+    port: 17831
+    opcodes:
+      - { id: "0001", name: VersionCheck, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "000A", name: ConnectionCheck, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "001F", name: UserLogin, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "002F", name: LoginStatusCheck, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "0031", name: RequestServerList, direction: c2s, status: confirmed, seen_in: emulator }
+  login:
+    port: 17832
+    opcodes:
+      - { id: "0001", name: VersionCheck, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "000A", name: ConnectionCheck, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "001F", name: UserLogin, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "0034", name: RequestCharaID, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "00A0", name: CreateChara, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "00A7", name: RequestMapID, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "0032", name: RequestMapServer, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "002A", name: GetMailAndFriendList, direction: c2s, status: confirmed, seen_in: emulator }
+  map:
+    port: 17833
+    opcodes:
+      - { id: "000A", name: ConnectionInit, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "0032", name: ConnectionCheck, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "0010", name: UserLogin, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "01FD", name: ChangeMap, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "13C7", name: FinishMapMove, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "0FA5", name: AttackModeChange, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "11FE", name: RequestMove, direction: c2s, status: confirmed, seen_in: emulator }
+      - { id: "11F8", name: CharaMove, direction: both, status: confirmed, seen_in: emulator }
+      - { id: "121B", name: MotionChange, direction: c2s, status: confirmed, seen_in: emulator }

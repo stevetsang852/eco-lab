@@ -1,0 +1,33 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ecolab-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ecolab
+      MYSQL_DATABASE: eco
+      MYSQL_USER: eco
+      MYSQL_PASSWORD: eco
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./contract/schema-min.sql:/docker-entrypoint-initdb.d/01-schema-min.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-ueco", "-peco"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+
+  contract-tests:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      ECO_MYSQL_HOST: mysql
+      ECO_MYSQL_USER: eco
+      ECO_MYSQL_PASSWORD: eco
+      ECO_MYSQL_DATABASE: eco
+    command: ["python", "-m", "pytest", "tests", "-q"]
