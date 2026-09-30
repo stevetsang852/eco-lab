@@ -7,6 +7,8 @@ Owner has a local black-box JP client (`eco.ver` 506, 2017-08-31).
 
 Next-AI entry: **[notes/AI_HANDOFF.md](notes/AI_HANDOFF.md)** · TODO: **[notes/TODO.md](notes/TODO.md)**
 
+Closed-loop (planned): **[notes/CLOSED_LOOP.md](notes/CLOSED_LOOP.md)** · Redis: **[contract/redis-schema.md](contract/redis-schema.md)**
+
 ## Roles of the three upstream repos
 
 | Role | Upstream | Use |
@@ -20,12 +22,11 @@ Do **not** merge the three into one process or one SQL schema.
 ## Layout
 
 ```text
-contract/            opcodes, boundaries, db-map, capture template
-contract/captures/   packet logs (no secrets, no client binaries)
-docker/              Dockerfile
+contract/            opcodes, boundaries, db-map, redis schema, captures
+docker/              Dockerfile + compose (MySQL now; Redis later)
 tests/               contract + compose CI
 scripts/             bootstrap three upstream clones
-notes/               TODO, AI handoff, debug playbook
+notes/               TODO, AI handoff, debug, closed-loop plan
 ```
 
 ## Quick start
@@ -52,32 +53,35 @@ Start order: World → Login → Map.
 ## Dev + debug loop (locked)
 
 1. Client `server.lst` → lab. Only your own server.
-2. Dump **after decrypt** (Emulator `Encryption` / `PacketKey`). Raw Wireshark is usually ciphertext.
-3. Log line: `ts, process, dir, opcode, len, hex, note` — `note` required.
-4. Ruler packets first: login `001F`, create `00A0`, move `11FE` / `11F8`.
-5. New opcode → `guessed` in `contract/opcodes.yaml` → handler in **forked** core → client screen confirms → `confirmed`.
-6. CI green on eco-lab before merging contract PRs.
+2. Dump **after decrypt**. Raw Wireshark is usually ciphertext.
+3. Log: `ts, process, dir, opcode, len, hex, note` — `note` required.
+4. Ruler first: login `001F`, create `00A0`, move `11FE` / `11F8`.
+5. New opcode → `guessed` → handler in **forked** core → client confirms → `confirmed`.
+6. CI green before merging contract PRs.
 
-Do not mark `confirmed` from Discord / Bahamut / Saga6 tables alone.
+## Closed loop (planned, do not implement before P0)
 
-## Airtest + ML (planned, not started)
+```text
+AI Brain → Airtest → eco.exe → [proxy] → Backend → MySQL + Redis Stream
+                ↑________________ telemetry (read-only) _____________|
+```
 
-Airtest = eyes/hands. Packet contract = ground truth. ML must not write DB.
+- AI / Airtest never writes MySQL.
+- Redis = session, cache, `eco:events` stream, action queue.
+- MySQL = account, char, items (source of truth).
+- Linux CI cannot run Airtest GUI.
 
-Order: **ML-0 rules (login/walk)** → **ML-1 OCR/scene** → later BC / LLM / RL.
-Every Airtest action must still produce a packet log that matches `opcodes.yaml`.
+Order stays: packet ruler → Redis events for `001F`/`11FE`/`11F8` → Airtest ML-0 → VLM/LLM.
 
 ## Licence
 
-This repo: Apache-2.0. Do not copy GPL Saga source here.
+Apache-2.0. No GPL Saga source in this tree.
 
 ## Status
 
-- [x] Contract templates + CI + compose
-- [x] Dev/debug playbook written
+- [x] Contracts + CI + compose + handoff + closed-loop docs
 - [ ] Fork EcoServerEmulator on `stevetsang852`
-- [ ] Core compile (.NET 4.5.2)
-- [ ] Handshake + move confirmed on owner client 506
-- [ ] Decrypt-side hex dump on Login `001F` and Map `11FE`
-- [ ] TCP proxy (forward-only)
+- [ ] Handshake + move on owner client 506
+- [ ] Decrypt-side dump `001F` / `11FE`
+- [ ] Redis `eco:events` from backend
 - [ ] Airtest ML-0

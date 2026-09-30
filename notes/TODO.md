@@ -1,44 +1,52 @@
 # TODO — next AI follow-up
 
-Check boxes in PRs. Do not skip the order.
+Do not skip the order. Closed-loop details: [CLOSED_LOOP.md](CLOSED_LOOP.md).
 
-## P0 — unblock runtime
+## P0 — runtime + packet ruler (NOW)
 
 - [ ] Fork https://github.com/cm-MMK-2/EcoServerEmulator to stevetsang852
 - [ ] Point README / handoff at that fork URL
-- [ ] Document local .NET 4.5.2 build steps (Windows)
-- [ ] Import only Emulator `sql/eco.sql` into lab MySQL
-- [ ] Owner: confirm `eco.ver` is 506; `server.lst` → 127.0.0.1 and matching ports
+- [ ] Document .NET 4.5.2 Windows build
+- [ ] Import only Emulator `sql/eco.sql`
+- [ ] Owner: `eco.ver` 506; `server.lst` → 127.0.0.1 + ports
+- [ ] Decrypt dump: Login `001F`
+- [ ] Decrypt dump: Map `11FE` / `11F8`
+- [ ] One login capture + one walk capture in `contract/captures/` (no secrets)
 
-## P0 — packet ruler
+## P1 — proxy + coords
 
-- [ ] Decrypt-side dump: Login `001F` UserLogin
-- [ ] Decrypt-side dump: Map `11FE` RequestMove and `11F8` CharaMove
-- [ ] Capture template used once for login (file in `contract/captures/`, no secrets)
-- [ ] Capture template used once for one-tile walk
-- [ ] Reclassify those opcodes as `client-replayed` in notes (keep yaml status rules consistent)
+- [ ] Forward-only TCP proxy
+- [ ] CI: capture YAML requires `note`
+- [ ] Map move writes `CharaData.X/Y/Dir`
 
-## P1 — lab tooling
+## P2 — Redis events (after ruler works)
 
-- [ ] Forward-only TCP proxy (log unknown opcodes; do not mutate packets)
-- [ ] CI test that capture YAML required keys exist (`note` mandatory)
-- [ ] Coordinate write-back ticket: Map move → `CharaData.X/Y/Dir`
+- [ ] Add Redis 7 to docker-compose (not in CI game path)
+- [ ] Backend publish to stream `eco:events` for `001F`, `11FE`, `11F8` only
+- [ ] Follow [contract/redis-schema.md](../contract/redis-schema.md)
+- [ ] Read-only Telemetry stub (`GET /events`, no writes)
 
-## P2 — first new feature after ruler
+## P3 — Airtest ML-0 (blocked until P0 green)
 
-- [ ] One NPC talk packet (guessed → handler → client confirm)
-- [ ] Still no full Saga SQL import
+- [ ] Rules-only login + walk (`test_smoke.py` on owner Windows)
+- [ ] Each action writes a capture with `note`
+- [ ] Decision cycle ≥ 1s; no LLM yet
 
-## P3 — Airtest / ML (blocked until P0 ruler green)
+## P4 — Brain / VLM (blocked until P3)
 
-- [ ] ML-0: Airtest script login + walk using **rules**, not LLM
-- [ ] Every Airtest action writes a packet capture with `note`
-- [ ] ML-1: OCR dialogue + scene label JSON schema
-- [ ] `Brain` interface stub only after ML-0 works
-- [ ] Do not train RL until backend events exist
+- [ ] `Brain.decide(screenshot, goal)` stub
+- [ ] Perception JSON schema in CLOSED_LOOP.md
+- [ ] Optional read of Telemetry to compare screen vs server
+- [ ] Mismatch → pause autoplay, do not auto-write DB
+
+## P5 — later
+
+- [ ] One NPC talk packet
+- [ ] No full Saga SQL import
+- [ ] No RL until events exist and rewards are defined from backend events
 
 ## Done
 
-- [x] eco-lab repo, contracts, docker-compose, GitHub Actions
-- [x] opcodes.yaml from Emulator Interface.json
-- [x] Dev/debug loop written into README + handoff
+- [x] eco-lab contracts, CI, compose
+- [x] Dev/debug + AI handoff
+- [x] Closed-loop architecture + Redis key draft documented
