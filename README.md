@@ -1,32 +1,31 @@
 # eco-lab
 
-Lab workspace for **Emil Chronicle Online / 伊希歐之夢 / 埃米爾物語** server research.
+Lab workspace for **Emil Chronicle Online / 伊希歐之夢 / 埃米爾物語**.
 
-This repository is **not** a playable private server and **does not** include the official game client.
+**Not** a playable private server. **Does not** ship the official client.
+Owner has a local black-box JP client (`eco.ver` 506, 2017-08-31).
 
-Upstream emulator authors already state the open-source core is incomplete (login, create character, move). This lab keeps three public codebases usable together **without merging them into one process**.
+Next-AI entry: **[notes/AI_HANDOFF.md](notes/AI_HANDOFF.md)** · TODO: **[notes/TODO.md](notes/TODO.md)**
 
 ## Roles of the three upstream repos
 
-| Role | Upstream | Why it is here |
+| Role | Upstream | Use |
 | --- | --- | --- |
-| **core** (runtime) | [cm-MMK-2/EcoServerEmulator](https://github.com/cm-MMK-2/EcoServerEmulator) | Clean Login / World / Map split, Apache-2.0, targets 2017-08-31 JP client |
-| **ref-saga** (library) | [karorogunso/SagaECO](https://github.com/karorogunso/SagaECO) | Historical scripts, jobs, maps — read-only reference |
-| **ref-docker** (ops) | [tarathep/SagaECO](https://github.com/tarathep/SagaECO) | Compose / config layout ideas — GPL-3.0, do not paste into core |
+| **core** | [cm-MMK-2/EcoServerEmulator](https://github.com/cm-MMK-2/EcoServerEmulator) | Runtime. Login / World / Map. Apache-2.0. Fork before editing. |
+| **ref-saga** | [karorogunso/SagaECO](https://github.com/karorogunso/SagaECO) | Scripts / jobs / maps. Read-only. |
+| **ref-docker** | [tarathep/SagaECO](https://github.com/tarathep/SagaECO) | Compose ideas. GPL-3.0 — do not paste into this tree. |
 
-Do **not** compile the three solutions into one binary.  
-Do **not** import both Emulator SQL and Saga SQL into the same schema.
-
-Target client (when you already have it): JP end-of-service build (`eco.ver` = 506, 2017-08-31). This repo does not distribute that client.
+Do **not** merge the three into one process or one SQL schema.
 
 ## Layout
 
 ```text
-contract/     shared contracts (opcodes, process boundaries, DB map)
-docker/       container definitions
-tests/        contract + compose tests (run in CI)
-scripts/      clone / bootstrap helpers
-notes/        week-1 checklist
+contract/            opcodes, boundaries, db-map, capture template
+contract/captures/   packet logs (no secrets, no client binaries)
+docker/              Dockerfile
+tests/               contract + compose CI
+scripts/             bootstrap three upstream clones
+notes/               TODO, AI handoff, debug playbook
 ```
 
 ## Quick start
@@ -36,21 +35,11 @@ git clone https://github.com/stevetsang852/eco-lab.git
 cd eco-lab
 python3 -m pip install -r tests/requirements.txt
 python3 -m pytest tests -q
-```
-
-Clone the three upstream trees next to this repo (not vendored, so licences stay separate):
-
-```bash
 ./scripts/bootstrap.sh
-```
-
-MySQL only (no game binaries in CI):
-
-```bash
 docker compose up -d mysql
 ```
 
-## Runtime ports (EcoServerEmulator)
+## Ports (EcoServerEmulator)
 
 | Process | Port |
 | --- | --- |
@@ -58,19 +47,37 @@ docker compose up -d mysql
 | LoginServer | 17832 |
 | MapServer | 17833 |
 
-Start order after you build core yourself: World → Login → Map.
+Start order: World → Login → Map.
+
+## Dev + debug loop (locked)
+
+1. Client `server.lst` → lab. Only your own server.
+2. Dump **after decrypt** (Emulator `Encryption` / `PacketKey`). Raw Wireshark is usually ciphertext.
+3. Log line: `ts, process, dir, opcode, len, hex, note` — `note` required.
+4. Ruler packets first: login `001F`, create `00A0`, move `11FE` / `11F8`.
+5. New opcode → `guessed` in `contract/opcodes.yaml` → handler in **forked** core → client screen confirms → `confirmed`.
+6. CI green on eco-lab before merging contract PRs.
+
+Do not mark `confirmed` from Discord / Bahamut / Saga6 tables alone.
+
+## Airtest + ML (planned, not started)
+
+Airtest = eyes/hands. Packet contract = ground truth. ML must not write DB.
+
+Order: **ML-0 rules (login/walk)** → **ML-1 OCR/scene** → later BC / LLM / RL.
+Every Airtest action must still produce a packet log that matches `opcodes.yaml`.
 
 ## Licence
 
-Original files in this repository are **Apache-2.0**.
-
-- EcoServerEmulator is Apache-2.0.
-- tarathep/SagaECO is GPL-3.0 — use it as a reference, do not copy source into this tree if you want to keep Apache-2.0.
+This repo: Apache-2.0. Do not copy GPL Saga source here.
 
 ## Status
 
-- [x] Contract templates
-- [x] Docker Compose (MySQL + test runner)
-- [x] GitHub Actions CI
-- [ ] Local core compile (needs .NET Framework 4.5.2 / Windows or a compatible toolchain)
-- [ ] Confirmed handshake against a 2017 client you already own
+- [x] Contract templates + CI + compose
+- [x] Dev/debug playbook written
+- [ ] Fork EcoServerEmulator on `stevetsang852`
+- [ ] Core compile (.NET 4.5.2)
+- [ ] Handshake + move confirmed on owner client 506
+- [ ] Decrypt-side hex dump on Login `001F` and Map `11FE`
+- [ ] TCP proxy (forward-only)
+- [ ] Airtest ML-0

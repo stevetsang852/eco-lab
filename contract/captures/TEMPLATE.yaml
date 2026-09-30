@@ -1,0 +1,16 @@
+# Copy to login-YYYYMMDD.yaml or walk-YYYYMMDD.yaml
+# Never commit passwords, tokens, or client binaries.
+
+session: local-lab
+client_ver: "506"
+when: "describe the single action"
+process: login   # login | world | map
+direction: c2s   # c2s | s2c
+opcode: "001F"
+payload_hex: ""
+decode: {}
+status: guessed  # guessed | confirmed
+note: "required — e.g. click login / walk one tile north"
+refs:
+  emulator: "LoginServer/LoginServerInterface.json"
+  saga: ""
