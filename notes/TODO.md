@@ -1,52 +1,41 @@
 # TODO — next AI follow-up
 
-Do not skip the order. Closed-loop details: [CLOSED_LOOP.md](CLOSED_LOOP.md).
+Do not skip the order.
+Playbooks: [REVERSE.md](REVERSE.md) · [CLOSED_LOOP.md](CLOSED_LOOP.md) · [DEV_DEBUG.md](DEV_DEBUG.md)
 
 ## P0 — runtime + packet ruler (NOW)
 
-- [ ] Fork https://github.com/cm-MMK-2/EcoServerEmulator to stevetsang852
+- [ ] Confirm fork https://github.com/stevetsang852/EcoServerEmulator exists; if 404, fork cm-MMK-2/EcoServerEmulator
 - [ ] Point README / handoff at that fork URL
-- [ ] Document .NET 4.5.2 Windows build
+- [ ] Document .NET 4.5.2 Windows build on the fork README
 - [ ] Import only Emulator `sql/eco.sql`
-- [ ] Owner: `eco.ver` 506; `server.lst` → 127.0.0.1 + ports
-- [ ] Decrypt dump: Login `001F`
-- [ ] Decrypt dump: Map `11FE` / `11F8`
-- [ ] One login capture + one walk capture in `contract/captures/` (no secrets)
+- [ ] Owner: `eco.ver` 506; `server.lst` → 127.0.0.1 + ports 17831/17832/17833
+- [ ] Post-decrypt dump: Login `001F` (server-side first; client hook only if needed)
+- [ ] Post-decrypt dump: Map `11FE` / `11F8`
+- [ ] One login + one walk YAML in `contract/captures/` (no secrets)
 
 ## P1 — proxy + coords
 
-- [ ] Forward-only TCP proxy
+- [ ] Forward-only TCP proxy (log unknown opcodes; do not mutate)
 - [ ] CI: capture YAML requires `note`
 - [ ] Map move writes `CharaData.X/Y/Dir`
 
+## P1b — RE only if server dump is ciphertext
+
+- [ ] Static: locate crypto vs Emulator Encryption/PacketKey
+- [ ] Optional Frida hook send/recv after decrypt on owner PC
+- [ ] Do not start Ghidra marathon before trying server-side dump
+
 ## P2 — Redis events (after ruler works)
 
-- [ ] Add Redis 7 to docker-compose (not in CI game path)
-- [ ] Backend publish to stream `eco:events` for `001F`, `11FE`, `11F8` only
-- [ ] Follow [contract/redis-schema.md](../contract/redis-schema.md)
-- [ ] Read-only Telemetry stub (`GET /events`, no writes)
+- [ ] Redis 7 in compose; publish `eco:events` for `001F`/`11FE`/`11F8` only
+- [ ] Read-only Telemetry stub
 
-## P3 — Airtest ML-0 (blocked until P0 green)
+## P3+ — Airtest / Brain blocked until P0 green
 
-- [ ] Rules-only login + walk (`test_smoke.py` on owner Windows)
-- [ ] Each action writes a capture with `note`
-- [ ] Decision cycle ≥ 1s; no LLM yet
-
-## P4 — Brain / VLM (blocked until P3)
-
-- [ ] `Brain.decide(screenshot, goal)` stub
-- [ ] Perception JSON schema in CLOSED_LOOP.md
-- [ ] Optional read of Telemetry to compare screen vs server
-- [ ] Mismatch → pause autoplay, do not auto-write DB
-
-## P5 — later
-
-- [ ] One NPC talk packet
-- [ ] No full Saga SQL import
-- [ ] No RL until events exist and rewards are defined from backend events
+See previous TODO P3–P5. No LLM, no RL yet.
 
 ## Done
 
-- [x] eco-lab contracts, CI, compose
-- [x] Dev/debug + AI handoff
-- [x] Closed-loop architecture + Redis key draft documented
+- [x] eco-lab contracts, CI, compose, closed-loop + Redis draft
+- [x] RE / tap playbook

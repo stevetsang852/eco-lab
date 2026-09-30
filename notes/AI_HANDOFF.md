@@ -6,19 +6,22 @@ GitHub user: stevetsang852
 
 ## Order
 
-1. [TODO.md](TODO.md) P0 only.
-2. Do not implement Redis/Airtest/LLM until P0 packet ruler is green.
-3. Architecture for later: [CLOSED_LOOP.md](CLOSED_LOOP.md), [../contract/redis-schema.md](../contract/redis-schema.md).
+1. [TODO.md](TODO.md) **P0 only**.
+2. Protocol RE: [REVERSE.md](REVERSE.md) — server-side decrypt dump first, not Ghidra-first.
+3. Later: [CLOSED_LOOP.md](CLOSED_LOOP.md), [../contract/redis-schema.md](../contract/redis-schema.md).
 
 ## Do not
 
-- Ship client binaries or account passwords.
+- Ship client binaries or passwords.
 - Merge three upstream servers / SQL dumps.
 - Copy GPL Saga into this repo.
 - Confirm opcodes without owner client replay.
 - Let AI write MySQL.
-- Hit third-party private servers.
+- Connect to third-party private servers.
+- Publish trainers / dupes.
 
 ## Immediate code
 
-Fork EcoServerEmulator → post-decrypt hex dump on `001F` and `11FE`.
+On fork `stevetsang852/EcoServerEmulator` (create if missing):
+post-decrypt hex dump on Login `001F` and Map `11FE`.
+Store sanitized captures in eco-lab `contract/captures/`.
