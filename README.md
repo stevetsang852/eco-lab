@@ -13,7 +13,7 @@ Closed-loop (planned): **[notes/CLOSED_LOOP.md](notes/CLOSED_LOOP.md)** · Redis
 
 | Role | Upstream | Use |
 | --- | --- | --- |
-| **core** | [cm-MMK-2/EcoServerEmulator](https://github.com/cm-MMK-2/EcoServerEmulator) | Runtime. Login / World / Map. Apache-2.0. Fork before editing. |
+| **core** | [cm-MMK-2/EcoServerEmulator](https://github.com/cm-MMK-2/EcoServerEmulator) → fork **[stevetsang852/EcoServerEmulator](https://github.com/stevetsang852/EcoServerEmulator)** | Runtime. Login / World / Map. Apache-2.0. All edits go to the fork. |
 | **ref-saga** | [karorogunso/SagaECO](https://github.com/karorogunso/SagaECO) | Scripts / jobs / maps. Read-only. |
 | **ref-docker** | [tarathep/SagaECO](https://github.com/tarathep/SagaECO) | Compose ideas. GPL-3.0 — do not paste into this tree. |
 
@@ -80,8 +80,9 @@ Apache-2.0. No GPL Saga source in this tree.
 ## Status
 
 - [x] Contracts + CI + compose + handoff + closed-loop docs
-- [ ] Fork EcoServerEmulator on `stevetsang852`
+- [x] Fork EcoServerEmulator on `stevetsang852`: [stevetsang852/EcoServerEmulator](https://github.com/stevetsang852/EcoServerEmulator)
+- [x] Decrypt-side dump `001F` / `11FE` / `11F8` (c2s): fork [PR #1](https://github.com/stevetsang852/EcoServerEmulator/pull/1), merged `d5d9fc9`. How to record: [fork README](https://github.com/stevetsang852/EcoServerEmulator#recording-a-session-for-eco-lab-step-by-step)
+- [ ] **P0 now: waiting for the owner to record a login + walk with client 506** (then: mask `debug.log` creds, add s2c dump, guard dump init failure)
 - [ ] Handshake + move on owner client 506
-- [ ] Decrypt-side dump `001F` / `11FE`
 - [ ] Redis `eco:events` from backend
 - [ ] Airtest ML-0
