@@ -1,0 +1,24 @@
+# Option A: ECO_CLIENT_PATH=/your/eco docker compose -f docker-compose.client.yml up --build
+# Option B: copy client into docker/client-lab/client-src then
+#   INSTALL_CLIENT=1 docker compose -f docker-compose.client.yml build
+# Browser: http://127.0.0.1:6080/vnc.html
+# server.lst host must be host.docker.internal (not 127.0.0.1).
+
+services:
+  eco-client:
+    build:
+      context: ./docker/client-lab
+      args:
+        INSTALL_CLIENT: ${INSTALL_CLIENT:-0}
+    image: eco-lab-client
+    shm_size: 1gb
+    ports:
+      - "6080:6080"
+    environment:
+      ECO_ROOT: /eco
+      ECO_EXE: eco.exe
+      SCREEN: 1280x720x24
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ${ECO_CLIENT_PATH:-./docker/client-lab/client-src}:/eco:ro

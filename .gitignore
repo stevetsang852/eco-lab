@@ -8,3 +8,5 @@ __pycache__/
 upstream/
 .env
 docker/data/
+docker/client-lab/client-src/*
+!docker/client-lab/client-src/README.md
