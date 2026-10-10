@@ -21,6 +21,10 @@ def test_client_lab_files_exist():
         "scripts/start-client-bind.bat",
         "scripts/start-client-baked.bat",
         "scripts/stop-client.bat",
+        "scripts/start_in_local.bat",
+        "scripts/start_in_docker.bat",
+        "start_in_local.bat",
+        "start_in_docker.bat",
     ]
     for rel in needed:
         assert (ROOT / rel).is_file(), rel
